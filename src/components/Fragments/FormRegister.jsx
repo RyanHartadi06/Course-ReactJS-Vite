@@ -1,7 +1,13 @@
+import { useEffect, useRef } from "react";
 import Button from "../Elements/Button";
 import InputForm from "../Elements/Input";
 
 const FormRegister = () => {
+  const nameRef = useRef(null);
+
+  useEffect(() => {
+    nameRef.current.focus();
+  }, []);
   return (
     <form>
       <InputForm
@@ -9,6 +15,7 @@ const FormRegister = () => {
         name="fullname"
         type="text"
         placeholder="Ryan Hartadi"
+        ref={nameRef}
       />
       <InputForm
         title="Email"
