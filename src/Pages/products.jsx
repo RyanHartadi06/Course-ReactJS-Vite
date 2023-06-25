@@ -3,35 +3,14 @@ import CardProduct from "../components/Fragments/CardProduct";
 import { useEffect, useState, useRef } from "react";
 import { getProducts } from "../services/product.service";
 import { getUsername } from "../services/login.service";
+import useLogin from "../hooks/useLogin";
 
 const ProductPage = () => {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
   const [products, setProducts] = useState([]); //TODO :  useState itu untuk menyimpan data yang akan di render ulang, dan useState itu akan selalu dijalankan ketika ada perubahan pada data yang disimpan
-  const [username, setUsername] = useState("");
-
-  useEffect(() => {
-    setCart(JSON.parse(localStorage.getItem("cart")) || []);
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) window.location.href = "/";
-    setUsername(getUsername(token));
-  }, []);
-
-  useEffect(() => {
-    if (products.length > 0 && cart.length > 0) {
-      const sum = cart.reduce((acc, item) => {
-        const product = products.find((product) => product.id === item.id);
-        return acc + product.price * item.qty;
-      }, 0);
-      setTotal(sum);
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
-  }, [cart, products]);
-
-  //TODO :  array dalam useEffect seperti componentdiidUpdate, dia akan selalu dijalankan ketika ada perubahan pada array tersebut
+  const username = useLogin();
+  const totalPriceRef = useRef(null);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -50,7 +29,22 @@ const ProductPage = () => {
     }
   };
 
-  const totalPriceRef = useRef(null);
+  useEffect(() => {
+    setCart(JSON.parse(localStorage.getItem("cart")) || []);
+  }, []);
+
+  useEffect(() => {
+    if (products.length > 0 && cart.length > 0) {
+      const sum = cart.reduce((acc, item) => {
+        const product = products.find((product) => product.id === item.id);
+        return acc + product.price * item.qty;
+      }, 0);
+      setTotal(sum);
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+  }, [cart, products]);
+
+  //TODO :  array dalam useEffect seperti componentdiidUpdate, dia akan selalu dijalankan ketika ada perubahan pada array tersebut
 
   useEffect(() => {
     if (cart.length > 0) {
@@ -62,7 +56,6 @@ const ProductPage = () => {
 
   useEffect(() => {
     getProducts((data) => {
-      console.log(data);
       setProducts(data);
     });
   }, []);
@@ -82,6 +75,7 @@ const ProductPage = () => {
                 <CardProduct key={key}>
                   <CardProduct.Header
                     image={product.image}
+                    id={product.id}
                   ></CardProduct.Header>
                   <CardProduct.Body title={product.title}>
                     {product.description}
