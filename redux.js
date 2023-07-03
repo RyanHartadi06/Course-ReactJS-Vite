@@ -4,6 +4,7 @@ import { createStore } from "redux";
 const cartReducer = (
   state = {
     cart: [{ id: 2, qty: 5 }],
+    isLogged: false,
   },
   action
 ) => {
@@ -12,6 +13,11 @@ const cartReducer = (
       return {
         ...state,
         cart: [...state.cart, action.payload],
+      };
+    case "LOG_IN":
+      return {
+        ...state,
+        isLogged: true,
       };
     default:
       return state;
@@ -23,11 +29,14 @@ const cartReducer = (
 const store = createStore(cartReducer);
 console.log("on create store:", store.getState());
 
-//dispatch
-const action1 = { type: "ADD_TO_CART", payload: { id: 1, qty: 20 } };
-store.dispatch(action1);
-
 //subscribe
 store.subscribe(() => {
   console.log("ON SUBSCRIBE:", store.getState());
 });
+
+//dispatch
+const action1 = { type: "ADD_TO_CART", payload: { id: 1, qty: 20 } };
+store.dispatch(action1);
+
+const actionLogin = { type: "LOG_IN", payload: { isLogged: true } };
+store.dispatch(actionLogin);
